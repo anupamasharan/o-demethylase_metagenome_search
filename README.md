@@ -32,7 +32,7 @@ Refer to enterez tutorial folder for these steps
 
 ##### 1.3.2 Mupliple Sequence Alignment using msa package in R
 
-There is an <a href = "https://bioconductor.org/packages/release/bioc/html/msa.html"> msa package </a> that can be installed with BioConductor which let’s us do msa very easily in R. Make sure <a href = "https://bioconductor.org/install/> BioConductor </a> is installed beforehand compatible with your version of RStudio. Refer to the R script (MSA.r) and generate the phylip file comaptibe with hmmer.
+There is an <a href = "https://bioconductor.org/packages/release/bioc/html/msa.html"> msa package </a> that can be installed with BioConductor which let’s us do msa very easily in R. Make sure <a href = "https://bioconductor.org/install/"> BioConductor </a> is installed beforehand compatible with your version of RStudio. Refer to the R script (MSA.r) and generate the phylip file comaptibe with hmmer.
 
 ##### 1.3.3 hmmer tools using linux command line/terminal
 
