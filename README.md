@@ -1,5 +1,5 @@
 # o-demethylase_metagenome_search
-Instructional project to help retreive co-localised o-demethylase operons from metagenomic data
+Instructional tool to help retreive co-localised o-demethylase operons from metagenomic data
 
 ## Background
 Corrinoid dependent O-demethylase enzyme systems (referred to henceforth as o-demethylases) typically consist of multiple component gene products that catalyse the important chemical modification of methylation and demethylation of aromatic ether compounds. They present a compelling biotransformation alternative to the more common S-adenosyl-methionine (SAM) dependent methyl transfer systems which catalyse the same process (as depicted in figure 1) irreversibly and therefore cannot be scaled up very well making the former systems more potent biocatalysts. Aromatic methyl ethers are degradation products of lignin, a very abundant aromatic renewable bipolymer. Demethylation of these compounds therefore is very important for development of the global bioeconomy [1].
