@@ -20,7 +20,9 @@ In this part we will see how the reference database supplied on the project page
 
 #### 1.2: Creating co-localised reference sequence database
 
-The CP, MT1 and MT2 sequences obatined in part 1.1 can now be mined for the co-localised operons to create the reference database. Use the python script attached (python_header_function.py) and modify as per your header files. Sample csv files are attached as reference.
+The CP, MT1 and MT2 sequences obatined in part 1.1 can now be mined for the co-localised operons to create the reference database. Use the python script attached (python_header_function.py) and modify as per your header files. Sample csv files are attached as reference generated from step 1.1. Following extraction of co-localised headers, you can feed them to the <a href = "https://www.ncbi.nlm.nih.gov/sites/batchentrez"> batch enterez tool </a> to obtain all the fasta sequences.
+
+#### Note : This script only searches for genes/operons that are immediately in the vicinty of each other (positions differ by +/- 1). However demethylase enzyme systems not specific to aryl-methyl ethers can have different orientations/organizations as well. Read more in this review by Schilhabel et al., 2009. [4]("https://jb.asm.org/content/191/2/588"). The script can be easily modified to accommodate combinations of numerical position based organization (lines 59, 67).
 
 #### 1.3: Build hidden markov model (using hmmer)
 
