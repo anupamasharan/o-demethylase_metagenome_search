@@ -44,11 +44,13 @@ $ hmmbuild o/p_filename.hmm input_alignment.phylip
 
 ### Part 2: Retrieve o-demethylase sequences from custom metagenomic database
 
+This part of the tool demonstrates how to download metagenomic datasets from online databases if the user wishes to do an exploratory data analysis from publicly available dataset. If the user has their own dataset, you can skip to step 2.2. 
+
 #### 2.1: Download metagenomic data
 
-#### Note: Skip this set if you have your dataset ready
+#### Note: Usually very big datasets can be more efficiently downloaded using online NCBI FTP site or the JGI-IMG download portal.
 
-This is demonstrated using biomartr package in R. Please see metegenome_dataset_download.r script.
+nThis is demonstrated using biomartr package in R. This package letsPlease see metegenome_dataset_download.r script.
 
 #### 2.2: Use hmmsearch to get hits
 
