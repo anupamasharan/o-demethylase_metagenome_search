@@ -48,9 +48,10 @@ This part of the tool demonstrates how to download metagenomic datasets from onl
 
 #### 2.1: Download metagenomic data
 
-#### Note: Usually very big datasets can be more efficiently downloaded using online NCBI FTP site or the JGI-IMG download portal.
+This is demonstrated using biomartr package in R. This package interfaces with the NCBI portal through R. One shortcoming of this package is that it downloads whole datasets with no way of selecting specific metegenomic datasets and/or files within those datasets. The metegenome_dataset_download.r script provided here also includes other packages to overcome these shortcomings and allow the user to be specific with dataset selection. This script can be easily modified to get any metagenome dataset of interest on NCBI.
 
-nThis is demonstrated using biomartr package in R. This package letsPlease see metegenome_dataset_download.r script.
+###### Note: Usually very big datasets can be more efficiently downloaded using online NCBI FTP site or the JGI-IMG download portal. The R script included in this tutorial is to enable easy interfacing with the other steps, implemented in R.
+
 
 #### 2.2: Use hmmsearch to get hits
 
