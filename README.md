@@ -26,7 +26,7 @@ The CP, MT1 and MT2 sequences obatined in part 1.1 can now be mined for the co-l
 
 #### 1.3: Build hidden markov model (using hmmer)
 
-From this step onwards we will be working in mostly R and a little in command line (for hidden markov model generation). The bioconductor software in R has packages that allow for constructing and working with multiple sequence alignments (msa) directly using well-known algorithms such as ClustalW and MUSCLE. To keep use biopython, you would need to have a msa tool installed in command line and then run a <a href = "http://biopython.org/DIST/docs/tutorial/Tutorial.html#sec92"> wrapper </a> from within Biopython. The user should keep in mind that running these algorithms from within R is computationally expensive. For bigger fasta file inputs, consider working on the command line directly. Working in R has another advantage of direct interfacing with some visualization tools.
+From this step onwards we will be working in mostly R and a little in linux (for hidden markov model generation). The bioconductor software in R has packages that allow for constructing and working with multiple sequence alignments (msa) directly using well-known algorithms such as ClustalW and MUSCLE. To keep use biopython, you would need to have a msa tool installed in command line and then run a <a href = "http://biopython.org/DIST/docs/tutorial/Tutorial.html#sec92"> wrapper </a> from within Biopython. The user should keep in mind that running these algorithms from within R is computationally expensive. For bigger fasta file inputs, consider working on the command line directly. Working in R has another advantage of direct interfacing with some visualization tools.
 
 ##### 1.3.1 Mupliple Sequence Alignment using msa package in R
 
@@ -36,7 +36,11 @@ There is a <a href = "https://bioconductor.org/packages/release/bioc/html/msa.ht
 
 ##### 1.3.3 hmmer tools using linux command line/terminal
 
-If you already have a linux or OS system, you can install the hmmmer binaries in your path and directly access them through R. With a windows system it is much more difficult and needs cgywin installation. Also a bigger motivation to do this outside R was because the hmmsearch function within R cannot search using custom hmmprofiles very easily without interfacing with some other functions/packages, is not very intuitive. On terminal it can be done very easily. The following command was used (assuming <a href = "http://hmmer.org/"> hmmer is </a> already installed following instructions on website).
+If you already have a linux or OS system, you can install the hmmmer binaries in your path and directly access them through R. With a windows system it is much more difficult and needs cgywin installation. Also a bigger motivation to do this outside R was because the hmmsearch function within R cannot search using custom hmmprofiles very easily without interfacing with some other functions/packages, is not very intuitive. 
+
+In python on the other hand, it seems possible to run hmm commands using the <a href = "https://pyhmmer.readthedocs.io/en/stable/index.html"> pyhmmer </a> package. However, when installing in a windows system, it might give some incompatibility with Microsoft Visual C++ and might require installing of Microsoft visual studio. 
+
+On terminal it can be done very easily. The following command was used (assuming <a href = "http://hmmer.org/"> hmmer is </a> already installed following instructions on website).
 
 Buidling hmm profile
 
@@ -54,19 +58,17 @@ This is demonstrated using <a href = "https://docs.ropensci.org/biomartr/"> biom
 
 #### 2.2: Use hmmsearch to get hits
 
-We will use the hmm profile generated in part 1.3.3 to get o-demethylase putative hits from our dataset. The following is a sample code that cane be modified as per the users requirement. Other forms of output can also be generated. In this pipeline, we will specifically use the table format of output (--tblout option) to get the desired headers.
+We will use the hmm profile generated in part 1.3.3 to get o-demethylase putative hits from our dataset. The following is a sample code that cane be modified as per the users requirement. Other forms of output can also be generated. In this pipeline, we will specifically use the optioinal table format of output (--tblout option) to get the desired headers.
 
 $ hmmsearch -o path/filename.txt -A path/msa_of_all_hits.sto --tblout path/filename.txt desired_hmm_profile_name.hmm sequence_database_to_search.faa
 
-hmmsearch -o /nfs/homes/sharanan/Documents/R_term_project/trial.txt -A /nfs/homes/sharanan/Documents/R_term_project/trial.sto --tblout /nfs/homes/sharanan/Documents/R_term_project/trial_table.txt --domtblout /nfs/homes/sharanan/Documents/R_term_project/trial_dom_table.txt /nfs/homes/sharanan/Documents/R_term_project/MT2.hmm /nfs/homes/sharanan/Documents/R_term_project/MT2_triplets_with_template.fasta 
-
 Alternatively hmmscan can also be used but hmmsearch is faster
 
-Following this the hits from the “.out” file for each hmmsearch run were stored in csv file to be imported and manipulated with R. 
+Following this the table output is imported in python and using the SearchIO package within biopython (refer to script parsing_hmm_output.py), the file is parsed to retrieve the headers in a format suitable for the python_header_function.py script referenced in section 1.2. Sample input/output file formats for all the steps in thi ssection are included in the uploads.
 
-#### 2.3: Retreiving co-localised sequence files
+#### 2.3: Retreiving co-localised sequence files from metagenome dataset
 
-The output file from step 2.2 will have the all headers belonging to CP, MT1 and MT2. These headers (in a csv format) should now go into the same python script referenced in part 1.2 tpo get sequences that are co-localised. Once you have the co-localised header list, you can go back to the metagenomic data sets to retrieve the sequences. These is a good tool which can be run on linux terminal which parses big metagenome datasets using a list of headers supplied as a text file and outputs the desried fasta sequences called <a href = "https://github.com/santiagosnchez/faSomeRecords"> faSomeRecords </a>. Any similar tool can be used to get the sequences.
+Once you have the co-localised header list, you can go back to the metagenomic data sets to retrieve the sequences. These is a good tool which can be run on linux terminal which parses big metagenome datasets using a list of headers supplied as a text file and outputs the desried fasta sequences called <a href = "https://github.com/santiagosnchez/faSomeRecords"> faSomeRecords </a> accepting the list of headers as a simple text file. Any similar tool can be used to get the sequences. A more simplistic version based on "grep" command in linux/bash can also be used using a -f flag for the header file input for patterns to be matched usually with a linearlised fasta file (with all sequences in one line under each header).
 
 ### Part 3: Visualisation in trees or network diagrams
 
