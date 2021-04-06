@@ -36,7 +36,7 @@ There is a <a href = "https://bioconductor.org/packages/release/bioc/html/msa.ht
 
 ##### 1.3.3 hmmer tools using linux command line/terminal
 
-If you already have a linux or OS system, you can install the hmmmer binaries in your path and directly access them through R. With a windows system it is much more difficult and needs cgywin installation. Also a bigger motivation to do this outside R was because the hmmsearch function within R cannot search using custom hmmprofiles very easily without interfacing with some other functions/packages, is not very intuitive. On terminal it can be done very easily. The following command was used (assuming hmmer is already installed following instructions on website).
+If you already have a linux or OS system, you can install the hmmmer binaries in your path and directly access them through R. With a windows system it is much more difficult and needs cgywin installation. Also a bigger motivation to do this outside R was because the hmmsearch function within R cannot search using custom hmmprofiles very easily without interfacing with some other functions/packages, is not very intuitive. On terminal it can be done very easily. The following command was used (assuming <a href = "http://hmmer.org/"> hmmer is </a> already installed following instructions on website).
 
 Buidling hmm profile
 
@@ -48,16 +48,17 @@ This part of the tool demonstrates how to download metagenomic datasets from onl
 
 #### 2.1: Download metagenomic data
 
-This is demonstrated using <a href = "https://docs.ropensci.org/biomartr/"> biomartr </a> package in R. This package interfaces with the NCBI portal through R. One shortcoming of this package is that it downloads whole datasets with no way of selecting specific metegenomic datasets and/or files within those datasets. The metegenome_dataset_download R markdown file provided here also includes other packages to overcome these shortcomings and allow the user to be specific with dataset selection. This file can be easily modified to get any metagenome dataset of interest on NCBI and converted into an executable script.
+This is demonstrated using <a href = "https://docs.ropensci.org/biomartr/"> biomartr </a> package in R. This package interfaces with the NCBI portal through R. One shortcoming of this package is that it downloads whole datasets with no way of selecting specific metegenomic datasets and/or files within those datasets. The "metegenome_dataset_download" R markdown file provided here also includes other packages to overcome these shortcomings and allow the user to be specific with dataset selection. This file can be easily modified to get any metagenome dataset of interest on NCBI and can also be converted into an executable script.
 
 ###### Note: Usually very big datasets can be more efficiently downloaded using online NCBI FTP site or the JGI-IMG download portal. The R script included in this tutorial is to enable easy interfacing with the other steps, implemented in R.
 
-
 #### 2.2: Use hmmsearch to get hits
 
-We will use the hmm profile generated in part 1.3.3 to get o-demethylase putative hits from our dataset.
+We will use the hmm profile generated in part 1.3.3 to get o-demethylase putative hits from our dataset. The following is a sample code that cane be modified as per the users requirement. Other forms of output can also be generated. In this pipeline, we will specifically use the table format of output (--tblout option) to get the desired headers.
 
-$ hmmsearch -o path/filename.out -A path_to_msa_of_all_hits.sto desired_hmm_profile_name.hmm sequence_database_to_search.faa
+$ hmmsearch -o path/filename.txt -A path/msa_of_all_hits.sto --tblout path/filename.txt desired_hmm_profile_name.hmm sequence_database_to_search.faa
+
+hmmsearch -o /nfs/homes/sharanan/Documents/R_term_project/trial.txt -A /nfs/homes/sharanan/Documents/R_term_project/trial.sto --tblout /nfs/homes/sharanan/Documents/R_term_project/trial_table.txt --domtblout /nfs/homes/sharanan/Documents/R_term_project/trial_dom_table.txt /nfs/homes/sharanan/Documents/R_term_project/MT2.hmm /nfs/homes/sharanan/Documents/R_term_project/MT2_triplets_with_template.fasta 
 
 Alternatively hmmscan can also be used but hmmsearch is faster
 
