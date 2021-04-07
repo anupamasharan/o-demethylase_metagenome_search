@@ -68,14 +68,20 @@ Following this the table output is imported in python and using the SearchIO pac
 
 #### 2.3: Retreiving co-localised sequence files from metagenome dataset
 
-Once you have the co-localised header list, you can go back to the metagenomic data sets to retrieve the sequences. These is a good tool which can be run on linux terminal which parses big metagenome datasets using a list of headers supplied as a text file and outputs the desried fasta sequences called <a href = "https://github.com/santiagosnchez/faSomeRecords"> faSomeRecords </a> accepting the list of headers as a simple text file. Any similar tool can be used to get the sequences. A more simplistic version based on "grep" command in linux/bash can also be used using a -f flag for the header file input for patterns to be matched usually with a linearlised fasta file (with all sequences in one line under each header).
+Once you have the co-localised header list, you can go back to the metagenomic data sets to retrieve the sequences. These is a good tool which can be run on linux terminal which parses big metagenome datasets using a list of headers supplied as a text file and outputs the desried fasta sequences called <a href = "https://github.com/santiagosnchez/faSomeRecords"> faSomeRecords </a> accepting the list of headers as a simple text file. Any similar tool can be used to get the sequences. A more simplistic version based on "grep" command in linux/bash can also be used using a -f flag for the header file input for patterns to be matched usually with a linearlised fasta file (with all sequences in one line under each header). As an example, the fasta files retrieved from the AD metagenome using the MT1 hmm are included.
 
 ### Part 3: Visualisation in trees or network diagrams
 
-#### 3.1 : Network diagrams using igraph package in R
+Once we have the fasta sequences, it will be interesting to see the diversity of the functional genes within a metagenome or in comparison to the template and RefSeq reference sequences. This diversity in sequences can be visualised either using a phylogenetic tree or using a network diagram. This will be helpful in understanding if this is a niche function limited to few taxonomic groups or if it is spread over a broad range of taxa. There are several ways to visualise relationships between sequences phylogenetically, two examples are given below. Having more than one diagram is also good for comparison.
+
+#### 3.1 : Tree diagrams using phangorn and ape packages in R 
+
+Phylogenetic trees are a biologists essential tool and they were the first visualization method for understanding evolutionary relationships. There are several algorithms for tree construction now and they depend on the user research questions. Most of these algorithms analyse the substitutions in a given set of sequence alignment and infer phylogenetic or evolutionary distance accordingly. The <a href ="https://fuzzyatelin.github.io/bioanth-stats/module-24/module-24.html#introduction"> resource </a> referenced in this example discusses uses the phangorn package which offers three algorithms for tree construction - neighbour-joining (nj), parsimony and maximum-likelihood (ml). The latter two are dependent on the construction of nj distance matrix first. Nj by itself is quite fast but will not be used because it relies on defining closest nodes as neighbours and keeps joining them together until tree construction is complete, but this distance joining is not guranteed to produce the most accurate tree since changing the distance calculation algorithm also changes the tree. 
+
+Earlier in the tutorial (section 1.3.1) we saw the we can use the msa package within R to generate the alignment. And since the tree construction is also within R, the alignment object can be passed directly, making this quite seamless. The input used here is the combined fasta file for the MT1 proteins from the AD metagenome and the template and reference sequences ("MT1_AD_fasta_example\MT1_co_loc_all.fasta"). The ml algorithm is used for tree construction. Refer to the "phylogenetic_tree_construction_with_R" markdown file.
 
 
-### 3.2 : Tree diagrams using phangorn and ape packages in R
+### 3.2 : Network diagrams using igraph package in R
 
 
 ## References
