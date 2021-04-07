@@ -8,7 +8,7 @@ Anaerobic acteogens and organohalide-respiring organisms encode this complicated
 
 ## The pipeline 
 
-This tool is a tutorial-style guide to enable a beginner-level bioinformatics user to be able to understand the logic behind the workflow presented for extracting o-demethylase sequences from user's metagenomic dataset, following creation of a hmm based reference dataset. The sequences are retrieved using a strict critieria of co-localisation to specifically find sequences that are suitable for heterlogous production and biochemical characterization, cutting other "metagenomic noise" as much as possible. However, if the target is to explore all possible sequences, then the search critieria presented can be relaxed accordingly. Also all parts of the workflow are tunable to the user preferance and level of expertise.
+This tool is a tutorial-style guide to enable a beginner-level bioinformatics user to be able to understand the logic behind the workflow presented for extracting o-demethylase sequences from user's metagenomic dataset, following creation of a hidden markov model (hmm) generated reference dataset. The sequences are retrieved using a strict critieria of co-localisation to specifically find sequences that are suitable for heterlogous production and biochemical characterization, cutting other "metagenomic noise" as much as possible. However, if the target is to explore all possible sequences, then the search critieria presented can be relaxed accordingly. Also all parts of the workflow are tunable to the user preferance and level of expertise.
 
 ### Part 1 Creating a reference hmm profile
 
