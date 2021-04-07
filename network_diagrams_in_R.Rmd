@@ -1,0 +1,172 @@
+---
+title: "Network_diagrams_in_R"
+author: "Anupama Sharan"
+date: "06/04/2021"
+output: html_document
+---
+## Visulisation using Sequence Similarity Networks (SSNs)
+
+```{r echo=TRUE}
+
+#install.packages("igraph")
+
+library(igraph)
+
+```
+
+
+### Visualising the MT1 AD enzyme system
+
+We are focusing on the MT1 system genes here but the same approach can be followed to get comaprisons for any other proteins across metagenomes. The run parameters for SSNPipe tool [1] are as follows:
+1. 1E-50 to 1E-150 step of 10 
+2. Gephi/tulip output format
+
+```{r echo=TRUE}
+
+#this csv file is the gelphi/tulip output from SSNPipe
+
+df_nodes_MT1 <- read.csv("NodeTable_gp.csv")
+
+colnames(df_nodes_MT1) = "ID"
+
+```
+
+#### Formatting input for igraph
+
+Let's format the dataframe so that it is more suitable. Make sure to set the working directory to the SSN output folder!
+```{r echo=TRUE}
+
+#library(tidyverse)
+#library(dplyr)
+#library(tibble)
+
+df_nodes_MT1_tidy <- df_nodes_MT1
+
+#igraph needs two columns called ID and Node_name identical for it's nodes variable
+
+df_nodes_MT1_tidy$Node_name <- df_nodes_MT1_tidy$ID
+df_nodes_MT1_tidy <- separate(df_nodes_MT1_tidy,"Node_name", c("Node_name","Label"), sep = ";")
+df_nodes_MT1_tidy$ID <- c(1:35) #make sure to update this based on the length of your dataset!
+
+#now we will separate Label column further. This is a bit tricky because of the different header styles but let's try
+
+df_nodes_MT1_tidy <- separate(df_nodes_MT1_tidy,"Label", c("Label","Annotation"), sep = " ", extra = "merge", fill = "right")
+
+#one more time
+
+df_nodes_MT1_tidy <- separate(df_nodes_MT1_tidy,"Annotation", c("Annotation","Organism"), sep = "\\[", extra = "merge", fill = "right")
+
+df_nodes_MT1_tidy$Organism <- gsub("\\]", "", df_nodes_MT1_tidy$Organism)
+
+#as we will want to color nodes by metagenome type later on, we will create a type variable for easy formatting. There are 3 categories for template sequences, RefSeq Sequences and the three different metagenomes
+
+#first we create an column with 0's (or could be NULL too)
+
+df_nodes_MT1_tidy$Label_type <- rep(0, nrow(df_nodes_MT1_tidy))
+
+df_nodes_MT1_tidy <- within(df_nodes_MT1_tidy, Label_type[startsWith(df_nodes_MT1_tidy$Label, "A")] <- 1)
+
+df_nodes_MT1_tidy <- within(df_nodes_MT1_tidy, Label_type[startsWith(df_nodes_MT1_tidy$Label, "W")] <- 2)
+
+df_nodes_MT1_tidy <- within(df_nodes_MT1_tidy, Label_type[startsWith(df_nodes_MT1_tidy$Label, "K")] <- 3)
+
+#we will also add a metagenome_type column
+
+df_nodes_MT1_tidy$Metagenome_type <- rep("", nrow(df_nodes_MT1_tidy))
+
+df_nodes_MT1_tidy <- within(df_nodes_MT1_tidy, Metagenome_type[startsWith(df_nodes_MT1_tidy$Label, "A")] <- "Template")
+
+df_nodes_MT1_tidy <- within(df_nodes_MT1_tidy, Metagenome_type[startsWith(df_nodes_MT1_tidy$Label, "W")] <- "RefSeq")
+
+df_nodes_MT1_tidy <- within(df_nodes_MT1_tidy, Metagenome_type[startsWith(df_nodes_MT1_tidy$Label, "K")] <- "AD")
+
+```
+
+The nodes file is all set, let's quickly modify the edges file too. We will work at the lowest e-value since we are accommodating for a wide range of e-values in the different metagenomes.
+
+```{r echo=TRUE}
+
+df_edges_MT1 <- read.csv("networks/NETWORK_gp_ev_50_.csv")
+
+colnames(df_edges_MT1) = "Source"
+
+```
+
+As before we need to split this column into multiple columns
+
+```{r echo=TRUE}
+
+df_edges_MT1_tidy <- separate(df_edges_MT1,"Source", c("Source","Target", "Weight"), sep = ";")
+
+```
+
+```{r echo=TRUE}
+#we will export these new files as csv to be read in later
+
+write.csv(df_nodes_MT1_tidy, file = "df_nodes_MT1_AD_tidy.csv", quote = FALSE, row.names = FALSE)
+
+write.csv(df_edges_MT1_tidy, file = "df_edges_MT1_AD_tidy.csv", quote = FALSE, row.names = FALSE)
+
+```
+
+#### Network visualisation and manipulation
+
+We will create the network first
+
+```{r echo=TRUE}
+
+nodes <- read.csv("igraph_input/df_nodes_MT1_AD_tidy.csv", header=T, as.is=T)
+
+edges <- read.csv("igraph_input/df_edges_MT1_AD_tidy.csv", header=T, as.is=T)
+
+#viewing the network
+
+network_MT1_AD_metagenomes <- graph_from_data_frame(d=edges, vertices=nodes, directed=F)
+
+class(network_MT1_AD_metagenomes)
+
+network_MT1_AD_metagenomes
+
+```
+
+Plotting the network
+
+```{r results='asis', fig.width = 7, fig.heigt = 11}
+
+#let's refine the diagram by styling 
+
+# Generate colors based on metagenome type:
+
+colrs <- c("red", "blue", "green")
+
+V(network_MT1_AD_metagenomes)$color <- colrs[V(network_MT1_AD_metagenomes)$Label_type]
+
+# Set node size based on label size, we want to have the template sequence the biggest followed by RefSeq sequences and then all the metagenomes will be the same size. 
+
+#Lines 150-162 might need to be commented out as this seemed to be incompatible with the knitting options but works fine within the markdown to generate the image.
+
+sizes <- c(12, 10, 8)
+
+V(network_MT1_AD_metagenomes)$size <- sizes[V(network_MT1_AD_metagenomes)$Label_type]
+
+# These are ways to manipulate the labels but for our figure a legend is included and for the scope of this tutorial it suffices so these steps have been commented out
+
+#V(network_MT1_all_metagenomes)$label.color <- "black"
+
+#V(network_MT1_all_metagenomes)$label.cex <- 0.8
+
+#V(network_MT1_all_metagenomes)$label.dist <- 2
+
+#V(network_MT1_all_metagenomes)$label <- V(network_MT1_all_metagenomes)$Metagenome_type
+
+plot.igraph(network_MT1_AD_metagenomes, edge.arrow.size=.4,vertex.label=NA)
+
+legend(x=-1.0, y=-1.1, c("Template_Sequences","RefSeq_NCBI", "Anaerobic_digester"), pch=21, col="#777777", pt.bg=colrs, pt.cex=2, cex=.8, bty="n", ncol=1)
+
+title("MT1 AD proteins clustering with Reference Sequences")
+
+```
+
+References:
+
+[1] Ahvdk, “ahvdk/SSNpipe,” GitHub. [Online]. Available: https://github.com/ahvdk/SSNpipe.

@@ -1,0 +1,158 @@
+---
+title: "metagenome_dataset_download"
+author: "Anupama Sharan"
+date: "04/04/2021"
+output: html_document
+---
+
+## Step 1: Retrieving publicly available metagenomic datasets from NCBI
+
+### 1.1: Software and Packages
+
+The biomartr package helps to retreieve genomic, metagenomic and metaproteomic data from avaialble datasets on NCBI.It can be installed very easily using a software called Bioconductor. 
+
+```{r echo=TRUE}
+#installing the software and packages 
+
+#if (!requireNamespace("BiocManager", quietly = TRUE))
+    #install.packages("BiocManager")
+#BiocManager::install(version = "3.10") #make sure to check documentation page for the correct version of BiocManager compatible with the version of R you are running
+
+#install some packages on which biomartr is dependent
+
+#BiocManager::install("Biostrings")
+#BiocManager::install("biomaRt")
+
+#finally biomartr is installed
+
+#install.packages("biomartr", dependencies = TRUE)
+
+#load all libraries
+
+library(BiocManager)
+library(Biostrings)
+library(biomaRt)
+library(biomartr)
+
+#all set now!
+
+```
+
+### 1.2: Manipulation of listMetaGenomes function output
+
+```{r echo=TRUE}
+
+#we will add details argument set to True to obtain all details of the metagenome, by default only the list of "organism_name" is returned 
+
+all_metagenomes_list <- listMetaGenomes(details =  TRUE)
+class(all_metagenomes_list)
+print(all_metagenomes_list)
+
+#we see that the output is in a nice data frame format, great for further manipulation
+
+```
+
+We now want to look for unique values in organism_name column to select for metagenomes we are interested in. This can either be done by subsetting the column as shown below or alternatively if the details argument is not included in the function above, the list returned will correspond to these values as well. Both are shown below:
+
+```{r echo=TRUE}
+
+environment_list_df <- unique(all_metagenomes_list$organism_name)
+print(environment_list_df)
+
+environment_list_online <- listMetaGenomes()
+print(environment_list_online)
+
+```
+
+Great, they are exactly the same! And now we have a sense of what ecosystem metegenomes can be retrieved with this code to do comparitive metagenomics across different ecosystems/environments. For this tutorial, we know from the background on corrinoid dependent o-demethylases, the kind that we are after, that these are found in anaerobic environments. So we will subset using some key terms that will output the some relevant ones.
+
+```{r echo=TRUE}
+#first let's load some common libraries for dataframe and string manipulation
+
+library(dplyr)
+library(stringr)
+
+relevant_metagenome_details <- all_metagenomes_list %>% 
+  filter(str_detect(organism_name, "anaerobic|bovine|fermentation|hydrocarbon|landfill|alkali")) %>% #filtering for relevant metagenomes, output will be in df format
+  filter(str_detect(assembly_level, "Scaffold")) %>% #filtering for scaffolds level assemblies as we don't want single contig assemblies to expand scope of search
+  arrange(desc(seq_rel_date)) #sorting by date to target more recent assemblies to get high quality data
+
+print(relevant_metagenome_details)
+
+```
+
+Great! This is the list we wanted. Notice that there are several different metagenomes for the same environment, therefore sorting by sequence release date is important. We will select the most recent from each unqiue environment and use the ftp link to look at the list of files hosted for each environment.
+
+```{r echo=TRUE}
+
+ftp_sites <- relevant_metagenome_details$ftp_path[c(1,3,6,7)]
+
+print(ftp_sites)
+
+```
+
+### 1.3: Downloading required files from NCBI and JGI-IMG/M
+
+To retreieve list of files in an online directory we will use the function "list_files_ftp" hosted within the "threadr" package [5]. There is also functions called "getMetaGenomes" (downloads fna files) and "getMetaGenomeAnnotations" (downloads gff files) within biomartr that get the ftp files. However, they only download whole lists hosted on NCBI and that much data is not needed. This function helps us to pick and choose which files we want and also helps to see if that file is present for the desired metagenome ftp site.
+
+```{r echo=TRUE}
+#install.packages("remotes") #this package is needed for threadr
+#remotes::install_github("skgrange/threadr")
+library(threadr)
+
+#we also define a local function for ftpfile list retrieval to make it customisable and lets you supply multiple urls (as in our case)
+
+ftp_file_list_retrieval <- function(url) {
+  ftp_file_list <- list_files_ftp(url, sleep = NA, sort = FALSE, verbose = TRUE)
+  return(ftp_file_list)
+}
+
+list_of_all_files <- ftp_file_list_retrieval(ftp_sites) #all files hosted for all metagenomes is returned
+
+print(list_of_all_files[1:10])# checking output
+print(length(list_of_all_files)) #checking total number of files
+
+```
+
+We see that there are 56 files. We are most interested in protein or .faa files for further manipulation. Note that files on ftp site are present in a compressed ".gz" format so we can include that in the regex.
+
+```{r echo=TRUE}
+
+desired_file_format_1 = ".faa.gz"
+
+print(list_of_all_files[c(grep(desired_file_format_1, list_of_all_files))])
+
+```
+
+We see that only one metagenome has protein files. This is frustrating for sure but expected since not all projects provide protein sequences. To check for nucleotide sequence files, the following code chunk can be run. 
+
+```{r echo=TRUE}
+
+desired_file_format_2 = ".fna.gz" #change to .faa.gz
+
+print(list_of_all_files[c(grep(desired_file_format_2, list_of_all_files))])
+
+```
+
+So there are opportunities to do gene prediction using tools like PRODIGAL (https://github.com/hyattpd/Prodigal) or PROKKA (https://github.com/tseemann/prokka) or several others and then import those files for analysis in this pipeline. To the best of my knowledge, I could not find an R tool that does CDS prediction from metagenomic contig inputs. For the meantime let's download and save the file in a desired location within the data folder or the working directory
+
+```{r echo=TRUE}
+
+#defining a function for online file download
+
+online_file_download <- function(url, destfile) {
+  download.file(url,destfile)
+  return()
+}
+
+#let's run grep again to get the desired index, we want the first file
+
+grep(desired_file_format_1, list_of_all_files)
+
+online_file_download(list_of_all_files[24],"metagenomic_data/NCBI/AD.faa.gz")
+
+list.files("metagenomic_data/NCBI/") 
+
+```
+
+We now have all predicted proteins of our dataset to search for the presence of o-demethylase system proteins (or any interesting functional protein!).
