@@ -42,6 +42,8 @@ def retrieving_fasta_files_online():
     handle_MT1 = Entrez.efetch(db="protein", id=",".join(MT1_IDs), rettype="fasta", retmode="text")
     handle_MT2 = Entrez.efetch(db="protein", id=",".join(MT2_IDs), rettype="fasta", retmode="text")
     
+    #you will need to create the "fasta_files_output" directory in the working directory prior to this step!
+    
     CP_ID_fasta = open("fasta_files_output/all_CP.fasta", "w") 
     CP_ID_fasta.write(handle_CP.read())
     CP_ID_fasta.close()
