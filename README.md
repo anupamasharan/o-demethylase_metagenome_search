@@ -12,7 +12,12 @@ Anaerobic acteogens and organohalide-respiring organisms encode this complicated
 
 ## The pipeline 
 
-This tool is a tutorial-style guide to enable a beginner-level bioinformatics user to be able to understand the logic behind the workflow presented for extracting o-demethylase sequences from user's metagenomic dataset, following creation of a hidden markov model (hmm) generated reference dataset. The sequences are retrieved using a strict criteria of co-localisation to specifically find sequences that are suitable for heterologous production and biochemical characterization, cutting other "metagenomic noise" as much as possible. However, if the target is to explore all possible sequences, then the search criteria presented can be relaxed accordingly. Also, all parts of the workflow are tunable to the user preference and level of expertise.
+This is a tutorial-style guide to enable users with minimal bioinformatics experience to obtain co-localised o-demethylase sequences from public or custom metagenomic datasets, following creation of a hidden markov model (hmm) generated reference dataset. The sequences are retrieved using one of the following two co-localisation criteria:
+
+1. Strict numerical co-localisation - suitable for databases where contig/scaffold information is not present in protein file headers (such as NCBI)
+(use script NCBI_Protein_hit_co_localised_sequence_headers_retrieval.py)
+2. (Recommended) Contig based co-localisation - wherever data linking genes to contigs/scaffols are available this script should be used as it is more representative of how these systems would be naturally found in envrionmental genomes. (JGI_IMG_Protein_hit_co_localised_sequence_headers_retrieval.py)
+Through this pipeline I suggest an approach to obtain protein targets suitable for direct biochemical characterization and assay development for functional o-demethylation. However, if the user's objective is to do explorative or comparitive metagenomeic studies for o-demethylation function, all sequence-search hits should be analysed. Also, all parts of the workflow are tunable to the user preference and level of expertise.
 
 ###### Note : The scripts and code used in the pipeline are provided as separate file uploads. The sample file formats needed for input in the different steps of the pipeline and output files generated are provided in a winrar zipped archive "sample_input_output_allsteps". The user should save all folders within the zipped archive to their working directory to test the pipeline.
 
@@ -28,7 +33,7 @@ In this part we will see how the reference database supplied on the project page
 
 The CP, MT1 and MT2 sequences obtained in part 1.1 can now be mined for the co-localised operons to create the reference database. Use the python script attached <b>(python_header_function.py)</b> and modify as per your header files. Sample csv files are attached as reference generated from step 1.1 in the <b>python header function input and output generated in the output folder</b>. Following extraction of co-localised headers, the csv output file can be fed as input to the python script <b>"bio_efetch.py"</b> to get the fasta sequences of the IDs from the header files. Example output from this script is provided in the <b>"efetch_output"</b> folder. This script uses the "efetch" module from the <a href = "https://biopython.org/docs/1.75/api/Bio.Entrez.html"> Bio.Entrez </a> package. Outside biopython this can also be done outside python using NCBI's <a href = "https://www.ncbi.nlm.nih.gov/sites/batchentrez"> batch enterez tool </a> to obtain all the fasta sequences.
 
-###### Note : The python_header_function script only searches for genes/operons that are immediately in the vicinity of each other (positions differ by +/- 1). However, demethylase enzyme systems not specific to aryl-methyl ethers can have different orientations/organizations as well. Read more in this review by Schilhabel et al., 2009. <a href = "https://jb.asm.org/content/191/2/588">[3] </a>. The script can be easily modified to accommodate combinations of numerical position based organization (lines 59, 67). The bio_efetch script will need the input headers formatted as per the example files supplied here to produce the desired output. Also, the output includes pairs of CP with MT1, MT2 in addition to triplets where CP, MT1 and MT2 are all co-localised. For the most stringent searches, such as obtaining candidates for heterologous production, only the triplets should be considered.
+###### Note : The NCBI_Protein_hit_co_localised_sequence_headers_retrieval.py script only searches for genes/operons that are immediately in the vicinity of each other (positions differ by +/- 1). However, demethylase enzyme systems not specific to aryl-methyl ethers can have different orientations/organizations as well. Read more in this review by Schilhabel et al., 2009. <a href = "https://jb.asm.org/content/191/2/588">[3] </a>. The script can be easily modified to accommodate combinations of numerical position based organization (lines 59, 67). The bio_efetch script will need the input headers formatted as per the example files supplied here to produce the desired output. Also, the output includes pairs of CP with MT1, MT2 in addition to triplets where CP, MT1 and MT2 are all co-localised. For the most stringent searches, such as obtaining candidates for heterologous production, only the triplets should be considered.
 
 #### 1.3: Build hidden markov model (using hmmer)
 
@@ -58,11 +63,17 @@ Sample hmms for CP, MT1 and MT2 sequences are provided in the <b>hmm_output</b> 
 
 This part of the tool demonstrates how to download metagenomic datasets from online databases if the user wishes to do an exploratory data analysis from publicly available dataset. If the user has their own dataset, you can skip to step 2.2. 
 
-#### 2.1: Download metagenomic data
+#### 2.1: Download publicly available metagenomic datasets
+
+##### 2.1.1 NCBI
 
 This is demonstrated using <a href = "https://docs.ropensci.org/biomartr/"> biomartr </a> package in R. This package interfaces with the NCBI portal through R. One shortcoming of this package is that it downloads whole datasets with no way of selecting specific metagenomic datasets and/or files within those datasets. The <b>metegenome_dataset_download</b> R markdown file provided here also includes other packages to overcome these shortcomings and allow the user to be specific with dataset selection. This file can be easily modified to get any metagenome dataset of interest on NCBI and can also be converted into an executable script. The file downloaded for the anaerobic digester metagenome can be found in the <b>metagenomic_data</b> folder.
 
 ###### Note: Usually very big datasets can be more efficiently downloaded using online NCBI FTP site or the JGI-IMG download portal. The R script included in this tutorial is to enable easy interfacing with the other steps, implemented in R.
+
+##### 2.1.2 JGI IMG/M
+
+These datasets can be found at <a href = "https://img.jgi.doe.gov/"> the website home page </a> using either accession IDs or keyword search. Please note that to download data you will need a user account. There are several tutorials available on the website through which the user can get familiar with the JGI workspace and downloading data. This is the <a href = "https://img.jgi.doe.gov/docs/IMGWorkspaceUserGuide.pdf"> guide </a> to using the workspace. The dataset used to generate sample files attached has IMG Genome ID: 3300050645 (<a href = "https://img.jgi.doe.gov/cgi-bin/m/main.cgi?section=TaxonDetail&page=taxonDetail&taxon_oid=3300050645"> link </a> to dataset).
 
 #### 2.2: Use hmmsearch to get hits
 
@@ -72,17 +83,17 @@ $ hmmsearch -o path/filename.txt -A path/msa_of_all_hits.sto --tblout path/filen
 
 Alternatively, hmmscan can also be used but hmmsearch is faster
 
-Following this the table output is imported in python and using the SearchIO package within biopython (refer to script <b>parsing_hmm_output.py</b>), the file is parsed to retrieve the headers and this output is in a format suitable for the python_header_function.py script referenced in section 1.2. Sample input/output file formats for this script is included in the <b>parsing_hmm_input/output</b> folders.
+Following this the table output is imported in python and using the SearchIO package within biopython (refer to script <b>parsing_hmm_output.py</b>), the file is parsed to retrieve the headers (<b>parsing_hmm_input/output</b> folder). Next, depending on you co-localisation crietria (explained in "The pipeline" section previously) use the output as input to either of the co-localised header retrieval python scripts (NCBI or JGI_IMG_Protein_hit_co_localised_sequence_headers_retrieval.py). Sample input/output file formats for both scripts based on  datasets used as examples are included in the <b>python_header_metageome_output</b> folders.
 
 #### 2.3: Retrieving co-localised sequence files from metagenome dataset
 
-Once you have the co-localised header list, you can go back to the metagenomic data sets to retrieve the sequences. These is a good tool which can be run on Linux terminal which parses big metagenome datasets using a list of headers supplied as a text file (convert the headers in the csv file in the <b>python_function_metagenome_output</b> folder to separate text files and input to an executable tool called <a href = "https://github.com/santiagosnchez/faSomeRecords"> faSomeRecords </a> that accepts the list of headers as a simple text file. Any similar tool can be used to get the sequences. A more simplistic version based on "grep" command in Linux/bash can also be used using a -f flag for the header file input for patterns to be matched usually with a linearized fasta file (with all sequences in one line under each header). As an example, the fasta files retrieved from the AD metagenome using the MT1 hmm are included.
+Once you have the co-localised header list, you can go back to the metagenomic data sets to retrieve the sequences. This is a good tool which can be run on Linux terminal which parses big metagenome datasets using a list of headers supplied as a text file (convert the headers in the csv file in the <b>python_function_metagenome_output</b> folder to separate text files and input to an executable tool called <a href = "https://github.com/santiagosnchez/faSomeRecords"> faSomeRecords </a> that accepts the list of headers as a simple text file. Any similar tool can be used to get the sequences. A more simplistic version based on "grep" command in Linux/bash can also be used using a -f flag for the header file input for patterns to be matched usually with a linearized fasta file (with all sequences in one line under each header). As an example, the co-localised fasta files retrieved from the NCBI metagenome dataset for co-localised MT1 hits are included (<b>fasta_sequence_retrieval_output_fasome</b>).
 
 ### Part 3: Visualisation in trees or network diagrams
 
 Once we have the fasta sequences, it will be interesting to see the diversity of the functional genes within a metagenome or in comparison to the template and RefSeq reference sequences. This diversity in sequences can be visualised either using a phylogenetic tree or using a sequence similarity network (SSN) diagram. This will be helpful in understanding if this is a niche function limited to few taxonomic groups or if it is spread over a broad range of taxa. There are several ways to visualise relationships between sequences phylogenetically, two examples are given below. Having more than one diagram is also good for comparison.
 
-###### Note : These steps are demonstrated with the combined fasta file for the MT1 proteins from the AD metagenome and the template and reference sequences (sample input and outputs to the different steps in part 3 are included in the MT1_AD_fasta_example including the fasta file, phyolgenetic tree output images, SSNPipe output, the network diagram input (igraph input) and the network diagram image.
+###### Note : These steps are demonstrated with the combined fasta file for the MT1 proteins from the NCBI AD metagenome and the template and reference sequences (sample input and outputs to the different steps in part 3 are included in the MT1_AD_fasta_example including the fasta file, phyolgenetic tree output images, SSNPipe output, the network diagram input (igraph input) and the network diagram image.
 
 #### 3.1 : Tree diagrams using phangorn and ape packages in R 
 
