@@ -56,25 +56,27 @@ def hmmer_input_parse():
             if num_hits > 0: # if there are more than 0 hits per query then we need to extract the info 
                 for i in range(0,num_hits): 
                     MT2_metagenome_headers.append(hits[i].id) # hit name
-                #for more information you could use the same handle and extract the other information
+                #for more information you could use the same handle and extract the other information if you have thresholds for selection of hits
                 #hmm_description = hits[i].description # hit decription 
                 #current_evalue = hits[i].evalue # evalue of hit
                 
         handle.close()
         
-    import os
-    os.makedirs('co_localised_sequence_search_input')
-    os.chdir('co_localised_sequence_search_input') 
+    #if you want output in a specific folder uncomment the following lines
+    #import os
+    #os.makedirs('co_localised_sequence_search_input')
+    #os.chdir('co_localised_sequence_search_input') 
     #WARNING: The working directory is changed at this step! Make sure to change it back to the working directory.
-    CP_metagenome_headers_df = pd.DataFrame(CP_metagenome_headers, columns = ['CP_ID'])
-    CP_metagenome_headers_df.to_csv("CP_metagenome_headers.csv", index = False)
     
-    MT1_metagenome_headers_df = pd.DataFrame(MT1_metagenome_headers, columns = ['MT1_ID'])
+    MT1_metagenome_headers_df = pd.DataFrame(MT1_metagenome_headers, columns = ['MT1_headers'])
     MT1_metagenome_headers_df.to_csv("MT1_metagenome_headers.csv", index = False)
     
-    MT2_metagenome_headers_df = pd.DataFrame( MT2_metagenome_headers, columns = ['MT2_ID'])
+    CP_metagenome_headers_df = pd.DataFrame(CP_metagenome_headers, columns = ['CP_headers'])
+    CP_metagenome_headers_df.to_csv("CP_metagenome_headers.csv", index = False)
+    
+    MT2_metagenome_headers_df = pd.DataFrame( MT2_metagenome_headers, columns = ['MT2_headers'])
     MT2_metagenome_headers_df.to_csv("MT2_metagenome_headers.csv", index = False)
     
-    return(print("The files are ready in the co_localised_sequence_search_input"))
+    return(print("The header files are ready in the working directory"))
 
 hmmer_input_parse()
