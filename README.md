@@ -17,6 +17,7 @@ This is a tutorial-style guide to enable users with minimal bioinformatics exper
 1. Strict numerical co-localisation - suitable for databases where contig/scaffold information is not present in protein file headers (such as NCBI)
 (use script NCBI_Protein_hit_co_localised_sequence_headers_retrieval.py)
 2. (Recommended) Contig based co-localisation - wherever data linking genes to contigs/scaffols are available this script should be used as it is more representative of how these systems would be naturally found in envrionmental genomes. (JGI_IMG_Protein_hit_co_localised_sequence_headers_retrieval.py)
+
 Through this pipeline I suggest an approach to obtain protein targets suitable for direct biochemical characterization and assay development for functional o-demethylation. However, if the user's objective is to do explorative or comparitive metagenomeic studies for o-demethylation function, all sequence-search hits should be analysed. Also, all parts of the workflow are tunable to the user preference and level of expertise.
 
 ###### Note : The scripts and code used in the pipeline are provided as separate file uploads. The sample file formats needed for input in the different steps of the pipeline and output files generated are provided in a winrar zipped archive "sample_input_output_allsteps". The user should save all folders within the zipped archive to their working directory to test the pipeline.
